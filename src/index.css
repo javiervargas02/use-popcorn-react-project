@@ -58,6 +58,13 @@ body {
   position: relative;
 }
 
+.loader-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .loader {
   text-align: center;
   text-transform: uppercase;
