@@ -58,7 +58,8 @@ body {
   position: relative;
 }
 
-.loader-container {
+.loader-container,
+.error-container {
   height: 100%;
   display: flex;
   justify-content: center;
