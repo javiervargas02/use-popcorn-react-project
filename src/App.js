@@ -6,6 +6,8 @@ import MovieList from "./components/MovieList";
 import WatchedMovieSummary from "./components/WatchedMovieSummary";
 import WatchedMovieList from "./components/WatchedMovieList";
 import Box from "./components/Box";
+import Loader from "./components/Loader";
+import ErrorMessage from "./components/ErrorMessage";
 
 const tempMovieData = [
   {
@@ -54,14 +56,43 @@ const tempWatchedData = [
   },
 ];
 
+const API_KEY = "450b0533";
+
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const query = "interstellar";
 
   useEffect(() => {
-    fetch("http://www.omdbapi.com/?apikey=450b0533&s=interstellar")
-      .then((res) => res.json())
-      .then((data) => setMovies(data.Search));
+    const getMovies = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+        );
+
+        if (!res.ok) {
+          throw new Error("The data could not be retrieved");
+        }
+        const data = await res.json();
+
+        if (data.Error) {
+          throw new Error(data.Error);
+        }
+
+        setMovies(data.Search);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      }
+
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+    };
+    getMovies();
   }, []);
 
   return (
@@ -71,7 +102,9 @@ export default function App() {
       </NavBar>
       <Main>
         <Box>
-          <MovieList movies={movies} />
+          {isLoading && <Loader />}
+          {error && <ErrorMessage message={error} />}
+          {!isLoading && !error && <MovieList movies={movies} />}
         </Box>
         <Box>
           <WatchedMovieSummary watched={watched} />
