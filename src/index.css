@@ -250,6 +250,7 @@ body {
 .details {
   line-height: 1.4;
   font-size: 1.4rem;
+  height: 100%;
 }
 
 .details header {
