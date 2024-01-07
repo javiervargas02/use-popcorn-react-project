@@ -105,6 +105,7 @@ export default function App() {
             <MovieDetail
               selectedId={selectedMovieId}
               closeMovie={() => setSelectedMovieId(null)}
+              addWatchedMovie={setWatched}
             />
           ) : (
             <>
