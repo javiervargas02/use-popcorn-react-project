@@ -8,6 +8,8 @@ import WatchedMovieList from "./components/WatchedMovieList";
 import Box from "./components/Box";
 import Loader from "./components/Loader";
 import ErrorMessage from "./components/ErrorMessage";
+import Search from "./components/Search";
+import MovieDetail from "./components/MovieDetail";
 
 const tempMovieData = [
   {
@@ -33,41 +35,25 @@ const tempMovieData = [
   },
 ];
 
-const tempWatchedData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: "tt0088763",
-    Title: "Back to the Future",
-    Year: "1985",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-];
-
 const API_KEY = "450b0533";
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const query = "interstellar";
+  const [query, setQuery] = useState("");
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   useEffect(() => {
+    if (query === "" || query.trim().length < 3) {
+      return;
+    }
+
     const getMovies = async () => {
       setIsLoading(true);
+      setError("");
+
       try {
         const res = await fetch(
           `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
@@ -78,7 +64,7 @@ export default function App() {
         }
         const data = await res.json();
 
-        if (data.Error) {
+        if (data.Response === "False") {
           throw new Error(data.Error);
         }
 
@@ -90,25 +76,42 @@ export default function App() {
 
       setTimeout(() => {
         setIsLoading(false);
-      }, 2000);
+      }, 500);
     };
     getMovies();
-  }, []);
+  }, [query]);
 
   return (
     <>
       <NavBar>
+        <Search query={query} handleChange={setQuery} />
         <ResultsCount movies={movies} />
       </NavBar>
       <Main>
         <Box>
           {isLoading && <Loader />}
           {error && <ErrorMessage message={error} />}
-          {!isLoading && !error && <MovieList movies={movies} />}
+          {!isLoading && !error && (
+            <MovieList
+              movies={movies}
+              selectMovie={(id) =>
+                setSelectedMovieId(id === selectedMovieId ? null : id)
+              }
+            />
+          )}
         </Box>
         <Box>
-          <WatchedMovieSummary watched={watched} />
-          <WatchedMovieList watched={watched} />
+          {selectedMovieId ? (
+            <MovieDetail
+              selectedId={selectedMovieId}
+              closeMovie={() => setSelectedMovieId(null)}
+            />
+          ) : (
+            <>
+              <WatchedMovieSummary watched={watched} />
+              <WatchedMovieList watched={watched} />
+            </>
+          )}
         </Box>
       </Main>
     </>
