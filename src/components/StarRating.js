@@ -12,16 +12,16 @@ const starContainerStyle = {
 };
 
 export default function StarRating({
-  maxRating,
+  maxRating = 5,
   color = "#fcc419",
   size = 25,
+  fontSize = 18,
 }) {
-  
   const textStyle = {
     lineHeight: 0,
     margin: 0,
     color,
-    fontSize: size,
+    fontSize,
   };
 
   const [rating, setRating] = useState(0);
