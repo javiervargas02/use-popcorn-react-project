@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
-
 import StarRating from "./StarRating";
 import Loader from "./Loader";
 
 const API_KEY = "450b0533";
 
-export default function MovieDetail({ selectedId, closeMovie }) {
+export default function MovieDetail({
+  selectedId,
+  closeMovie,
+  addWatchedMovie,
+  watched,
+}) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUserRating] = useState(0);
 
   const {
     Title: title,
     Poster: poster,
+    Year: year,
     Runtime: runtime,
     imdbRating,
     Plot: plot,
@@ -21,7 +27,31 @@ export default function MovieDetail({ selectedId, closeMovie }) {
     Genre: genre,
   } = movie;
 
-  console.log(movie);
+  let initialRating = 0;
+
+  watched.forEach((watchedMovie) => {
+    if (watchedMovie.imdbID === selectedId) {
+      initialRating = watchedMovie.userRating;
+    }
+  });
+
+  const isAddButtonVisible = userRating > 0 && initialRating !== userRating;
+  const isWatchedButtonVisible =
+    (userRating === 0 && initialRating > 0) ||
+    (initialRating === userRating && userRating !== 0 && initialRating !== 0);
+
+  const handleAddWatched = () => {
+    const new_watched_movie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(" ").at(0)),
+      userRating,
+    };
+    addWatchedMovie(new_watched_movie);
+  };
 
   useEffect(() => {
     const getMovieDetails = async () => {
@@ -78,7 +108,22 @@ export default function MovieDetail({ selectedId, closeMovie }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating maxRating={10} size={25} />
+              <StarRating
+                maxRating={10}
+                size={25}
+                onSetRating={setUserRating}
+                initialRating={initialRating}
+              />
+              {isAddButtonVisible && (
+                <button className="btn-add" onClick={handleAddWatched}>
+                  {initialRating > 0
+                    ? "Update rating"
+                    : "+ Add to watched list"}
+                </button>
+              )}
+              {isWatchedButtonVisible && (
+                <span className="btn-add-disabled">✅ Wacthed</span>
+              )}
             </div>
             <p>
               <em>{plot}</em>
