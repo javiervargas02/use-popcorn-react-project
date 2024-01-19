@@ -45,6 +45,29 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [selectedMovieId, setSelectedMovieId] = useState(null);
 
+  const handleAddWatched = (movie) => {
+    if (
+      watched.some(
+        (watchedMovie) =>
+          watchedMovie.imdbID === movie.imdbID &&
+          watchedMovie.userRating !== movie.userRating
+      )
+    ) {
+      setWatched((prev) =>
+        prev.map((watchedMovie) =>
+          watchedMovie.imdbID === movie.imdbID
+            ? { ...watchedMovie, userRating: movie.userRating }
+            : watchedMovie
+        )
+      );
+    } else if (
+      !watched.some((watchedMovie) => watchedMovie.imdbID === movie.imdbID)
+    ) {
+      setWatched((prev) => [...prev, movie]);
+    }
+    setSelectedMovieId(null);
+  };
+
   useEffect(() => {
     if (query === "" || query.trim().length < 3) {
       return;
@@ -105,7 +128,8 @@ export default function App() {
             <MovieDetail
               selectedId={selectedMovieId}
               closeMovie={() => setSelectedMovieId(null)}
-              addWatchedMovie={setWatched}
+              addWatchedMovie={handleAddWatched}
+              watched={watched}
             />
           ) : (
             <>
