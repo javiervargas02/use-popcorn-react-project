@@ -22,7 +22,7 @@ export default function WatchedMovieSummary({ watched }) {
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating ? avgUserRating : "-"}</span>
         </p>
         <p>
           <span>⏳</span>
