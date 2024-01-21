@@ -27,13 +27,9 @@ export default function MovieDetail({
     Genre: genre,
   } = movie;
 
-  let initialRating = 0;
-
-  watched.forEach((watchedMovie) => {
-    if (watchedMovie.imdbID === selectedId) {
-      initialRating = watchedMovie.userRating;
-    }
-  });
+  const initialRating =
+    watched.find((watchedMovie) => watchedMovie.imdbID === selectedId)
+      ?.userRating || 0;
 
   const isAddButtonVisible = userRating > 0 && initialRating !== userRating;
   const isWatchedButtonVisible =
@@ -82,6 +78,14 @@ export default function MovieDetail({
     };
     getMovieDetails();
   }, [selectedId]);
+
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+    return () => {
+      document.title = "usePopcorn - Movie List";
+    };
+  }, [title]);
 
   return (
     <div className="details">
