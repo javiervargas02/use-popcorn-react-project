@@ -68,6 +68,10 @@ export default function App() {
     setSelectedMovieId(null);
   };
 
+  const handleRemove = (id) => {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  };
+
   useEffect(() => {
     if (query === "" || query.trim().length < 3) {
       return;
@@ -134,7 +138,7 @@ export default function App() {
           ) : (
             <>
               <WatchedMovieSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList watched={watched} handleRemove={handleRemove} />
             </>
           )}
         </Box>
